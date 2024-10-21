@@ -11,17 +11,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Set Version
-        id: set-version
-        run: |
-          echo "::set-output name=version::$(cat Tag | head -n1)"
-          echo "Tag=$(cat Tag | head -n1)"
-          echo "::set-output name=status::success"
-
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Set Version
+        id: set-version
+        run: echo "version=$(cat Tag | head -n1)" >> $GITHUB_OUTPUT
 
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v3
