@@ -1,4 +1,4 @@
-ARG SINGBOX_VERSION=v1.11.0-alpha.1
+ARG SINGBOX_VERSION=v1.10.1
 
 # FROM superng6/singbox:${SINGBOX_VERSION}
 FROM ghcr.io/sagernet/sing-box:${SINGBOX_VERSION} AS sing-box
