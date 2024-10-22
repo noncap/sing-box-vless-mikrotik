@@ -1,4 +1,4 @@
-name: Build on Dockerfile changes
+name: Build Docker image
 
 on:
   workflow_dispatch:
@@ -6,6 +6,7 @@ on:
     paths:
       - "Dockerfile"
       - "Tag"
+      - "TagDev"
 
 jobs:
   build:
@@ -18,7 +19,9 @@ jobs:
 
       - name: Set Version
         id: set-version
-        run: echo "version=$(cat Tag | head -n1)" >> $GITHUB_OUTPUT
+        run: |
+          echo "version=$(cat Tag | head -n1)" >> $GITHUB_OUTPUT
+          echo "version_dev=$(cat TagDev | head -n1)" >> $GITHUB_OUTPUT
 
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v3
@@ -32,7 +35,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and Push to Docker Hub
+      - name: Build and Push to Docker Hub (release)
         uses: docker/build-push-action@v6
         with:
           file: ./Dockerfile
@@ -43,6 +46,18 @@ jobs:
             ani1ak/singbox-vless-mikrotik:latest
           build-args: |
             SINGBOX_VERSION=${{ steps.set-version.outputs.version }}
+
+      - name: Build and Push to Docker Hub (dev)
+        uses: docker/build-push-action@v6
+        with:
+          file: ./Dockerfile
+          platforms: linux/arm/v7,linux/arm64
+          push: true
+          tags: |
+            ani1ak/singbox-vless-mikrotik:${{ steps.set-version.outputs.version_dev }}
+            ani1ak/singbox-vless-mikrotik:dev
+          build-args: |
+            SINGBOX_VERSION=${{ steps.set-version.outputs.version_dev }}
 
       - name: Docker Hub Description
         uses: peter-evans/dockerhub-description@v4
