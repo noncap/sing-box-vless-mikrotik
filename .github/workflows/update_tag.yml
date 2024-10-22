@@ -15,4 +15,4 @@ jobs:
           fetch-depth: 0
 
       - name: Update tags and commit changes
-        run: bash .github/workflows/update_release_tag.sh
+        run: bash .github/workflows/update_tag.sh
