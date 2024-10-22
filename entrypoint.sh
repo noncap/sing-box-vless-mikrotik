@@ -73,6 +73,10 @@ config_file() {
     {
       "type": "dns",
       "tag": "dns-out"
+    },
+    {
+      "type": "direct",
+      "tag": "direct"
     }
   ],
   "route": {
