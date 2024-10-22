@@ -39,8 +39,8 @@ jobs:
           platforms: linux/arm/v7,linux/arm64
           push: true
           tags: |
-            ani1ak/singbox-mikrotik:${{ steps.set-version.outputs.version }}
-            ani1ak/singbox-mikrotik:latest
+            ani1ak/singbox-vless-mikrotik:${{ steps.set-version.outputs.version }}
+            ani1ak/singbox-vless-mikrotik:latest
           build-args: |
             SINGBOX_VERSION=${{ steps.set-version.outputs.version }}
 
@@ -49,4 +49,4 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: ani1ak/singbox-mikrotik
+          repository: ani1ak/singbox-vless-mikrotik
