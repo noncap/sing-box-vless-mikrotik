@@ -16,6 +16,9 @@ SHORT_ID="${SHORT_ID:-}"
 config_file() {
   cat > /singbox.json << EOF
 {
+  "log": {
+    "level": "${LOG_LEVEL}"
+  },
   "dns": {
     "servers": [
       {
@@ -24,9 +27,6 @@ config_file() {
         "detour": "direct"
       }
     ]
-  },
-  "log": {
-    "level": "${LOG_LEVEL}"
   },
   "inbounds": [
     {
