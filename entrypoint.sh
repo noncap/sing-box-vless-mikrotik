@@ -16,6 +16,15 @@ SHORT_ID="${SHORT_ID:-}"
 config_file() {
   cat > /singbox.json << EOF
 {
+  "dns": {
+    "servers": [
+      {
+        "tag": "dns-local",
+        "address": "local",
+        "detour": "direct"
+      }
+    ]
+  },
   "log": {
     "level": "${LOG_LEVEL}"
   },
@@ -59,12 +68,11 @@ config_file() {
           "short_id": "${SHORT_ID}"
         }
       },
-      "multiplex": {
-        "enabled": false,
-        "protocol": "h2mux",
-        "max_streams": 128
-      },
       "packet_encoding": "xudp"
+    },
+    {
+      "type": "dns",
+      "tag": "dns-out"
     }
   ],
   "route": {
@@ -73,7 +81,11 @@ config_file() {
       {
         "inbound": "tun-in",
         "outbound": "vless-out"
-      }
+      },
+      {
+        "port": 53,
+        "outbound": "dns-out"
+      },
     ]
   }
 }
