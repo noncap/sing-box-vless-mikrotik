@@ -99,8 +99,8 @@ EOF
 
 run() {
   config_file
-  /bin/sing-box check -c /singbox.json
-  /bin/sing-box run -c /singbox.json
+  /bin/sing-box check -c /singbox.json --disable-color
+  /bin/sing-box run -c /singbox.json --disable-color
 }
 
 run || exit 1
