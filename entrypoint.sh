@@ -23,7 +23,7 @@ config_file() {
     "servers": [
       {
         "tag": "dns-local",
-        "address": "local",
+        "address": "dhcp://auto",
         "detour": "direct"
       }
     ]
