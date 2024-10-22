@@ -1,8 +1,8 @@
 # singbox-mikrotik
 
-sing-box container for RouterOS for VLESS in tun mode
+sing-box container for RouterOS, configured for VLESS with tun interface
 
-Docker Hub: https://hub.docker.com/repository/docker/ani1ak/vless-mikrotik
+Docker Hub: https://hub.docker.com/repository/docker/ani1ak/singbox-mikrotik
 
 Required env variables:
 ```

@@ -32,7 +32,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push to Docker Hub
+      - name: Build and Push to Docker Hub
         uses: docker/build-push-action@v6
         with:
           file: ./Dockerfile
@@ -43,3 +43,10 @@ jobs:
             ani1ak/singbox-mikrotik:latest
           build-args: |
             SINGBOX_VERSION=${{ steps.set-version.outputs.version }}
+
+      - name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: ani1ak/singbox-mikrotik
