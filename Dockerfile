@@ -1,7 +1,7 @@
 ARG SINGBOX_VERSION=v1.10.1
 
-FROM ghcr.io/sagernet/sing-box:${SINGBOX_VERSION} as sing-box
-FROM alpine:3.20 as certs
+FROM ghcr.io/sagernet/sing-box:${SINGBOX_VERSION} AS sing-box
+FROM alpine:3.20 AS certs
 RUN apk add --no-cache ca-certificates
 
 FROM busybox:1.37-musl
