@@ -26,8 +26,7 @@ config_file() {
         "address": "local",
         "detour": "direct"
       }
-    ],
-    "disable_cache": true
+    ]
   },
   "inbounds": [
     {
