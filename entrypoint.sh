@@ -22,8 +22,13 @@ config_file() {
   "dns": {
     "servers": [
       {
-        "tag": "dns-local",
+        "tag": "dns-direct",
         "address": "dhcp://auto",
+        "detour": "direct"
+      },
+      {
+        "tag": "dns-local",
+        "address": "local",
         "detour": "direct"
       }
     ]
