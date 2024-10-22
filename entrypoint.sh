@@ -36,15 +36,11 @@ config_file() {
       "address": ["198.18.0.1/24"],
       "mtu": 1500,
       "auto_route": true,
-      "strict_route": false,
+      "auto_redirect": true,
+      "strict_route": true,
       "stack": "gvisor",
       "sniff": false,
-      "route_exclude_address": [
-        "192.168.0.0/16",
-        "172.16.0.0/12",
-        "10.0.0.0/8"
-      ],
-      "domain_strategy": "ipv4_only"
+      "route_exclude_address": ["192.168.0.0/16", "172.16.0.0/12", "10.0.0.0/8"]
     }
   ],
   "outbounds": [

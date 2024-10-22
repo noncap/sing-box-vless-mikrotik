@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - "Dockerfile"
+      - "entrypoint.sh"
 
 jobs:
   build:
