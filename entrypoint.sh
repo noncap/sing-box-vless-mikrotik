@@ -22,16 +22,12 @@ config_file() {
   "dns": {
     "servers": [
       {
-        "tag": "dns-direct",
-        "address": "dhcp://auto",
-        "detour": "direct"
-      },
-      {
         "tag": "dns-local",
         "address": "local",
         "detour": "direct"
       }
-    ]
+    ],
+    "disable_cache": true
   },
   "inbounds": [
     {
