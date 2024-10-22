@@ -89,7 +89,7 @@ config_file() {
       {
         "port": 53,
         "outbound": "dns-out"
-      },
+      }
     ]
   }
 }
