@@ -17,10 +17,12 @@ if [ "${TagLocal}" != "${TagRemote}" ]; then
   echo ${TagRemote} > ./Tag
   git commit -am "Update version to ${TagRemote}"
   git push -v --progress
+  echo "status=success" >> $GITHUB_OUTPUT
 fi
 
 if [ "${TagDevLocal}" != "${TagDevRemote}" ]; then
   echo ${TagDevRemote} > ./TagDev
   git commit -am "Update dev version to ${TagDevRemote}"
   git push -v --progress
+  echo "status_dev=success" >> $GITHUB_OUTPUT
 fi
