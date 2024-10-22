@@ -36,7 +36,6 @@ config_file() {
       "address": ["198.18.0.1/24"],
       "mtu": 1500,
       "auto_route": true,
-      "auto_redirect": true,
       "strict_route": true,
       "stack": "gvisor",
       "sniff": false,
