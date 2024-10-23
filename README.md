@@ -21,6 +21,7 @@ Optional env variables:
 ```
 /container envs
 add name=vless key=LOG_LEVEL value=debug
+add name=vless key=DNS value=local
 add name=vless key=REMOTE_PORT value=443
 add name=vless key=FLOW value=xtls-rprx-vision
 add name=vless key=FINGER_PRINT value=chrome

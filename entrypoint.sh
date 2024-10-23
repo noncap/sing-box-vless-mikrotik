@@ -1,5 +1,6 @@
 #!/bin/sh
 LOG_LEVEL="${LOG_LEVEL:-info}"
+DNS="${DNS:-local}"
 
 REMOTE_ADDRESS="${REMOTE_ADDRESS:-}"
 REMOTE_PORT="${REMOTE_PORT:-443}"
@@ -23,8 +24,8 @@ config_file() {
   "dns": {
     "servers": [
       {
-        "tag": "dns-local",
-        "address": "local",
+        "tag": "dns-direct",
+        "address": "${DNS}",
         "detour": "direct"
       }
     ]
