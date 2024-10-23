@@ -45,7 +45,7 @@ config_file() {
       "mtu": 1500,
       "auto_route": true,
       "strict_route": true,
-      "stack": "gvisor",
+      "stack": "system",
       "sniff": false,
       "route_exclude_address": ["192.168.0.0/16", "172.16.0.0/12", "10.0.0.0/8"]
     }
