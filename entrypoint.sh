@@ -26,6 +26,12 @@ config_file() {
       {
         "tag": "dns-direct",
         "address": "${DNS}",
+        "address_resolver": "dns-local",
+        "detour": "direct"
+      },
+      {
+        "tag": "dns-local",
+        "address": "local",
         "detour": "direct"
       }
     ]
