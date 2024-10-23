@@ -1,5 +1,5 @@
 #!/bin/sh
-LOG_LEVEL="${LOG_LEVEL:-debug}"
+LOG_LEVEL="${LOG_LEVEL:-info}"
 
 REMOTE_ADDRESS="${REMOTE_ADDRESS:-}"
 REMOTE_PORT="${REMOTE_PORT:-443}"
@@ -17,7 +17,8 @@ config_file() {
   cat > /singbox.json << EOF
 {
   "log": {
-    "level": "${LOG_LEVEL}"
+    "level": "${LOG_LEVEL}",
+    "timestamp": false
   },
   "dns": {
     "servers": [
