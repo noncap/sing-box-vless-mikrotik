@@ -2,7 +2,7 @@ ARG SINGBOX_VERSION=v1.10.1
 
 FROM ghcr.io/sagernet/sing-box:${SINGBOX_VERSION} AS sing-box
 FROM alpine:3.20 AS certs
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache ca-certificates-bundle
 
 FROM busybox:1.37-musl
 LABEL maintainer="Anton Kudriavtsev <anidetrix@proton.me>"
