@@ -1,16 +1,20 @@
 #!/bin/sh
+# log
 LOG_LEVEL="${LOG_LEVEL:-info}"
+
+# dns
 DNS="${DNS:-local}"
 
+# tun
+TUN_STACK="${TUN_STACK:-system}"
+
+# vless
 REMOTE_ADDRESS="${REMOTE_ADDRESS:-}"
 REMOTE_PORT="${REMOTE_PORT:-443}"
-
 ID="${ID:-}"
 FLOW="${FLOW:-xtls-rprx-vision}"
-
 SERVER_NAME="${SERVER_NAME:-}"
 FINGER_PRINT="${FINGER_PRINT:-chrome}"
-
 PUBLIC_KEY="${PUBLIC_KEY:-}"
 SHORT_ID="${SHORT_ID:-}"
 
@@ -45,7 +49,7 @@ config_file() {
       "mtu": 1500,
       "auto_route": true,
       "strict_route": true,
-      "stack": "gvisor",
+      "stack": "${TUN_STACK}",
       "sniff": false,
       "route_exclude_address": ["192.168.0.0/16", "172.16.0.0/12", "10.0.0.0/8"]
     }
