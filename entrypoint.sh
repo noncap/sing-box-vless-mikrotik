@@ -46,6 +46,7 @@ config_file() {
       "tag": "tun-in",
       "interface_name": "tun0",
       "address": ["198.18.0.1/30"],
+      "gso": true,
       "mtu": 1500,
       "auto_route": true,
       "strict_route": true,
