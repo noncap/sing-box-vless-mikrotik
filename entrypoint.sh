@@ -47,7 +47,7 @@ config_file() {
       "interface_name": "tun0",
       "address": ["198.18.0.1/30"],
       "mtu": 1500,
-      "auto_route": false,
+      "auto_route": true,
       "strict_route": true,
       "stack": "${TUN_STACK}",
       "sniff": false,
@@ -103,10 +103,6 @@ config_file() {
 EOF
 }
 
-run() {
-  config_file
-  /bin/sing-box check -c /singbox.json --disable-color
-  /bin/sing-box run -c /singbox.json --disable-color
-}
-
-run || exit 1
+config_file
+sing-box check -c /singbox.json --disable-color || exit 1
+exec sing-box run -c /singbox.json --disable-color
