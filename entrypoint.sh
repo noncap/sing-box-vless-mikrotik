@@ -1,6 +1,6 @@
 #!/bin/sh
 # log
-LOG_LEVEL="${LOG_LEVEL:-info}"
+LOG_LEVEL="${LOG_LEVEL:-warn}"
 
 # dns
 DNS="${DNS:-local}"

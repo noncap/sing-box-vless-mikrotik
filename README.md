@@ -20,7 +20,7 @@ Optional env variables:
 
 ```
 /container envs
-add name=vless key=LOG_LEVEL value=debug
+add name=vless key=LOG_LEVEL value=warn
 add name=vless key=DNS value=local
 add name=vless key=TUN_STACK value=system
 add name=vless key=REMOTE_PORT value=443
