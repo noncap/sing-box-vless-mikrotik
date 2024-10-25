@@ -46,7 +46,7 @@ config_file() {
       "tag": "tun-in",
       "interface_name": "tun0",
       "address": ["198.18.0.1/30"],
-      "mtu": 9000,
+      "mtu": 1500,
       "auto_route": true,
       "strict_route": true,
       "stack": "${TUN_STACK}",
@@ -90,11 +90,11 @@ config_file() {
     "auto_detect_interface": true,
     "rules": [
       {
-        "inbound": "tun-in",
+        "inbound": ["tun-in"],
         "outbound": "vless-out"
       },
       {
-        "port": 53,
+        "port": [53],
         "outbound": "dns-out"
       }
     ]
