@@ -47,7 +47,7 @@ config_file() {
       "interface_name": "tun0",
       "address": ["198.18.0.1/30"],
       "mtu": 1500,
-      "auto_route": true,
+      "auto_route": false,
       "strict_route": true,
       "stack": "${TUN_STACK}",
       "sniff": false,
