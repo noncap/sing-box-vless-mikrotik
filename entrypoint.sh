@@ -18,8 +18,7 @@ FINGER_PRINT="${FINGER_PRINT:-chrome}"
 PUBLIC_KEY="${PUBLIC_KEY:-}"
 SHORT_ID="${SHORT_ID:-}"
 
-config_file() {
-  cat > /singbox.json << EOF
+cat > /singbox.json << EOF
 {
   "log": {
     "level": "${LOG_LEVEL}",
@@ -101,8 +100,6 @@ config_file() {
   }
 }
 EOF
-}
 
-config_file
 sing-box check -c /singbox.json --disable-color || exit 1
 exec sing-box run -c /singbox.json --disable-color
