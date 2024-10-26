@@ -51,6 +51,13 @@ cat > /singbox.json << EOF
       "stack": "${TUN_STACK}",
       "sniff": false,
       "route_exclude_address": ["192.168.0.0/16", "172.16.0.0/12", "10.0.0.0/8"]
+    },
+    {
+      "type": "socks",
+      "tag": "socks-in",
+      "listen": "$(ip -o -f inet address show eth0 | awk '/scope global/ {print $4}' | cut -d/ -f1)",
+      "listen_port": 1080,
+      "sniff": false
     }
   ],
   "outbounds": [
@@ -89,7 +96,7 @@ cat > /singbox.json << EOF
     "auto_detect_interface": true,
     "rules": [
       {
-        "inbound": ["tun-in"],
+        "inbound": ["tun-in", "socks-in"],
         "outbound": "vless-out"
       },
       {
