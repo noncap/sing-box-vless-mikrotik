@@ -37,7 +37,9 @@ cat > /singbox.json << EOF
         "address": "local",
         "detour": "direct"
       }
-    ]
+    ],
+    "strategy": "prefer_ipv4",
+    "reverse_mapping": true
   },
   "inbounds": [
     {
@@ -49,15 +51,13 @@ cat > /singbox.json << EOF
       "auto_route": true,
       "strict_route": true,
       "stack": "${TUN_STACK}",
-      "sniff": false,
       "route_exclude_address": ["192.168.0.0/16", "172.16.0.0/12", "10.0.0.0/8"]
     },
     {
       "type": "socks",
       "tag": "socks-in",
       "listen": "$(ip -o -f inet address show eth0 | awk '/scope global/ {print $4}' | cut -d/ -f1)",
-      "listen_port": 1080,
-      "sniff": false
+      "listen_port": 1080
     }
   ],
   "outbounds": [
@@ -84,10 +84,6 @@ cat > /singbox.json << EOF
       "packet_encoding": "xudp"
     },
     {
-      "type": "dns",
-      "tag": "dns-out"
-    },
-    {
       "type": "direct",
       "tag": "direct"
     }
@@ -97,11 +93,12 @@ cat > /singbox.json << EOF
     "rules": [
       {
         "inbound": ["tun-in", "socks-in"],
+        "action": "route",
         "outbound": "vless-out"
       },
       {
         "port": [53],
-        "outbound": "dns-out"
+        "action": "hijack-dns"
       }
     ]
   }
