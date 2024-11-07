@@ -30,12 +30,12 @@ cat > /singbox.json << EOF
         "tag": "dns-direct",
         "address": "${DNS}",
         "address_resolver": "dns-local",
-        "detour": "direct"
+        "detour": "bypass"
       },
       {
         "tag": "dns-local",
         "address": "local",
-        "detour": "direct"
+        "detour": "bypass"
       }
     ],
     "strategy": "prefer_ipv4",
@@ -85,7 +85,7 @@ cat > /singbox.json << EOF
     },
     {
       "type": "direct",
-      "tag": "direct"
+      "tag": "bypass"
     }
   ],
   "route": {
