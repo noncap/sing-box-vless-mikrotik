@@ -2,10 +2,16 @@ name: Force Build Docker image
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "Dockerfile"
-      - "entrypoint.sh"
+    inputs:
+      version:
+        description: "Version(s) to build"
+        required: true
+        default: "all"
+        type: choice
+        options:
+          - release
+          - dev
+          - all
 
 jobs:
   build:
@@ -33,6 +39,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and Push to Docker Hub (release)
+        if: inputs.version == 'release' || inputs.version == 'all'
         uses: docker/build-push-action@v6
         with:
           file: ./Dockerfile
@@ -45,6 +52,7 @@ jobs:
             SINGBOX_VERSION=${{ steps.set-version.outputs.version }}
 
       - name: Build and Push to Docker Hub (dev)
+        if: inputs.version == 'dev' || inputs.version == 'all'
         uses: docker/build-push-action@v6
         with:
           file: ./Dockerfile
