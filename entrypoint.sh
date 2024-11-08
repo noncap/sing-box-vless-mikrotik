@@ -51,7 +51,12 @@ cat > /singbox.json << EOF
       "auto_route": true,
       "strict_route": true,
       "stack": "${TUN_STACK}",
-      "route_exclude_address": ["192.168.0.0/16", "172.16.0.0/12", "10.0.0.0/8"]
+      "route_exclude_address": [
+        "192.168.0.0/16",
+        "172.16.0.0/12",
+        "10.0.0.0/8",
+        "fc00::/7"
+      ]
     },
     {
       "type": "socks",
