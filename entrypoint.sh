@@ -89,6 +89,10 @@ cat > /singbox.json << EOF
       "packet_encoding": "xudp"
     },
     {
+      "type": "dns",
+      "tag": "dns-out"
+    },
+    {
       "type": "direct",
       "tag": "bypass"
     }
@@ -98,12 +102,11 @@ cat > /singbox.json << EOF
     "rules": [
       {
         "inbound": ["tun-in", "socks-in"],
-        "action": "route",
         "outbound": "vless-out"
       },
       {
         "port": [53],
-        "action": "hijack-dns"
+        "outbound": "dns-out"
       }
     ]
   }
