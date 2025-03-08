@@ -4,6 +4,10 @@ git config --local user.email "41898282+github-actions[bot]@users.noreply.github
 
 TagRemote=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases | jq -r '.[] | select(.prerelease == false) | .tag_name' | head -n1)
 TagDevRemote=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases | jq -r '.[] | select(.prerelease == true) | .tag_name' | head -n1)
+if [ -z "${TagRemote}" ] && [ -z "${TagDevRemote}" ]; then
+  echo "Version check failed!"
+  exit 1
+fi
 
 TagLocal=$(cat Tag | head -n1)
 TagDevLocal=$(cat TagDev | head -n1)
