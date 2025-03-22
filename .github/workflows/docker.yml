@@ -23,6 +23,30 @@ jobs:
           echo "version=$(cat Tag | head -n1)" >> $GITHUB_OUTPUT
           echo "version_dev=$(cat TagDev | head -n1)" >> $GITHUB_OUTPUT
 
+      - name: Setup Docker meta (release)
+        if: steps.up-version.outputs.status == 'success'
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ani1ak/singbox-vless-mikrotik
+            ghcr.io/${{ github.repository }}
+          tags: |
+            type=semver,pattern={{version}},value=${{ steps.set-version.outputs.version }}
+            type=raw,value=latest
+
+      - name: Setup Docker meta (dev)
+        if: steps.up-version.outputs.status_dev == 'success'
+        id: meta_dev
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ani1ak/singbox-vless-mikrotik
+            ghcr.io/${{ github.repository }}
+          tags: |
+            type=semver,pattern={{version}},value=${{ steps.set-version.outputs.version_dev }}
+            type=raw,value=dev
+
       - name: Setup QEMU
         if: steps.up-version.outputs.status == 'success' || steps.up-version.outputs.status_dev == 'success'
         uses: docker/setup-qemu-action@v3
@@ -46,33 +70,29 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and Push to Docker Hub (release)
+      - name: Build and Push (release)
         if: steps.up-version.outputs.status == 'success'
         uses: docker/build-push-action@v6
         with:
+          context: .
           file: ./Dockerfile
           platforms: linux/arm/v7,linux/arm64,linux/amd64
           push: true
-          tags: |
-            ani1ak/singbox-vless-mikrotik:${{ steps.set-version.outputs.version }}
-            ani1ak/singbox-vless-mikrotik:latest
-            ghcr.io/${{ github.repository }}:${{ steps.set-version.outputs.version }}
-            ghcr.io/${{ github.repository }}:latest
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             SINGBOX_VERSION=${{ steps.set-version.outputs.version }}
 
-      - name: Build and Push to Docker Hub (dev)
+      - name: Build and Push (dev)
         if: steps.up-version.outputs.status_dev == 'success'
         uses: docker/build-push-action@v6
         with:
+          context: .
           file: ./Dockerfile
           platforms: linux/arm/v7,linux/arm64,linux/amd64
           push: true
-          tags: |
-            ani1ak/singbox-vless-mikrotik:${{ steps.set-version.outputs.version_dev }}
-            ani1ak/singbox-vless-mikrotik:dev
-            ghcr.io/${{ github.repository }}:${{ steps.set-version.outputs.version_dev }}
-            ghcr.io/${{ github.repository }}:dev
+          tags: ${{ steps.meta_dev.outputs.tags }}
+          labels: ${{ steps.meta_dev.outputs.labels }}
           build-args: |
             SINGBOX_VERSION=${{ steps.set-version.outputs.version_dev }}
 
