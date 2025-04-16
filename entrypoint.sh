@@ -3,7 +3,7 @@
 LOG_LEVEL="${LOG_LEVEL:-warn}"
 
 # dns
-DNS="${DNS:-local}"
+DNS="${DNS:-8.8.8.8}"
 
 # tun
 TUN_STACK="${TUN_STACK:-system}"
@@ -18,6 +18,17 @@ FINGER_PRINT="${FINGER_PRINT:-chrome}"
 PUBLIC_KEY="${PUBLIC_KEY:-}"
 SHORT_ID="${SHORT_ID:-}"
 
+# ruleset
+RULESET="${RULESET:-}"
+RULESET_ONLY="${RULESET_ONLY:-}"
+if [ -n "${RULESET_ONLY}" ]; then
+  rout="vless-out"
+  fout="bypass"
+else
+  rout="bypass"
+  fout="vless-out"
+fi
+
 cat > /singbox.json << EOF
 {
   "log": {
@@ -26,6 +37,12 @@ cat > /singbox.json << EOF
   },
   "dns": {
     "servers": [
+      {
+        "tag": "dns-proxy",
+        "address": "${DNS}",
+        "address_resolver": "dns-direct",
+        "detour": "vless-out"
+      },
       {
         "tag": "dns-direct",
         "address": "${DNS}",
@@ -39,6 +56,7 @@ cat > /singbox.json << EOF
       }
     ],
     "strategy": "prefer_ipv4",
+    "independent_cache": true,
     "reverse_mapping": true
   },
   "inbounds": [
@@ -97,18 +115,38 @@ cat > /singbox.json << EOF
     "auto_detect_interface": true,
     "rules": [
       {
-        "inbound": ["tun-in", "socks-in"],
-        "action": "route",
-        "outbound": "vless-out"
-      },
-      {
         "port": [53],
         "action": "hijack-dns"
       }
-    ]
+    ],
+    "rule_set": [],
+    "final": "${fout}"
+  },
+  "experimental": {
+    "cache_file": {
+      "enabled": true
+    }
   }
 }
 EOF
+
+if [ -n "${RULESET}" ]; then
+  OLDIFS=$IFS
+  IFS=,
+  i=1
+  for url in ${RULESET}; do
+    case "${url}" in
+    *.json) format=source ;;
+    *) format=binary ;;
+    esac
+    jq -r --arg tag "ruleset-${i}" --arg format ${format} --arg url ${url} --arg out ${rout} \
+      '.route.rule_set += [{"tag":$tag,"type":"remote","format":$format,"url":$url,"download_detour":"vless-out","update_interval":"2h"}]
+     | .route.rules += [{"rule_set":$tag,"action":"route","outbound":$out}]' /singbox.json > /singbox.json.new
+    mv /singbox.json.new /singbox.json
+    i=$((i + 1))
+  done
+  IFS=$OLDIFS
+fi
 
 sing-box check -c /singbox.json --disable-color || exit 1
 exec sing-box run -c /singbox.json --disable-color
