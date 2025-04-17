@@ -18,15 +18,18 @@ FINGER_PRINT="${FINGER_PRINT:-chrome}"
 PUBLIC_KEY="${PUBLIC_KEY:-}"
 SHORT_ID="${SHORT_ID:-}"
 
-# ruleset
-RULESET="${RULESET:-}"
-RULESET_ONLY="${RULESET_ONLY:-}"
-if [ -n "${RULESET_ONLY}" ]; then
-  rout="vless-out"
-  fout="bypass"
-else
-  rout="bypass"
-  fout="vless-out"
+# rules
+WHITELIST_MODE="${WHITELIST_MODE:-}"
+RULESETS="${RULESETS:-}"
+DOMAINS="${DOMAINS:-}"
+
+out="vless-out"
+out_rules="bypass"
+if [ -n "${WHITELIST_MODE}" ]; then
+  _out=${out}
+  out=${out_rules}
+  out_rules=${_out}
+  unset _out
 fi
 
 cat > /singbox.json << EOF
@@ -120,7 +123,7 @@ cat > /singbox.json << EOF
       }
     ],
     "rule_set": [],
-    "final": "${fout}"
+    "final": "${out}"
   },
   "experimental": {
     "cache_file": {
@@ -130,16 +133,27 @@ cat > /singbox.json << EOF
 }
 EOF
 
-if [ -n "${RULESET}" ]; then
+if [ -n "${DOMAINS}" ]; then
+  OLDIFS=$IFS
+  IFS=,
+  for domain in ${DOMAINS}; do
+    jq -r --arg domain ${domain} --arg out ${out_rules} \
+      '.route.rules += [{"domain_suffix":$domain,"action":"route","outbound":$out}]' /singbox.json > /singbox.json.new
+    mv /singbox.json.new /singbox.json
+  done
+  IFS=$OLDIFS
+fi
+
+if [ -n "${RULESETS}" ]; then
   OLDIFS=$IFS
   IFS=,
   i=1
-  for url in ${RULESET}; do
+  for url in ${RULESETS}; do
     case "${url}" in
     *.json) format=source ;;
     *) format=binary ;;
     esac
-    jq -r --arg tag "ruleset-${i}" --arg format ${format} --arg url ${url} --arg out ${rout} \
+    jq -r --arg tag "ruleset-${i}" --arg format ${format} --arg url ${url} --arg out ${out_rules} \
       '.route.rule_set += [{"tag":$tag,"type":"remote","format":$format,"url":$url,"download_detour":"vless-out","update_interval":"2h"}]
      | .route.rules += [{"rule_set":$tag,"action":"route","outbound":$out}]' /singbox.json > /singbox.json.new
     mv /singbox.json.new /singbox.json
