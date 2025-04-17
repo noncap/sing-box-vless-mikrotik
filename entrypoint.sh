@@ -155,7 +155,7 @@ if [ -n "${RULESETS}" ]; then
 		EOF
 		i=$((i + 1))
 		_rulesets="${_rulesets}\"${tag}\","
-		sing-box merge /singbox.json -c /singbox.json -c ${_tmp} --disable-color
+		sing-box merge singbox.json -D / -c /singbox.json -c ${_tmp} --disable-color
 		rm -f ${_tmp}
 		unset _tmp
 	done
@@ -173,7 +173,7 @@ if [ -n "${RULESETS}" ]; then
 		  }
 		}
 	EOF
-	sing-box merge /singbox.json -c /singbox.json -c ${_tmp} --disable-color
+	sing-box merge singbox.json -D / -c /singbox.json -c ${_tmp} --disable-color
 	rm -f ${_tmp}
 	unset _rulesets _tmp
 fi
@@ -194,14 +194,14 @@ if [ -n "${DOMAINS}" ]; then
 		  }
 		}
 	EOF
-	sing-box merge /singbox.json -c /singbox.json -c ${_tmp} --disable-color
+	sing-box merge singbox.json -D / -c /singbox.json -c ${_tmp} --disable-color
 	rm -f ${_tmp}
 	unset _domains _tmp
 fi
 
 _tmp=$(mktemp)
 echo '{"route":{"rules":[{"port":[53],"action":"hijack-dns"}]}}' > ${_tmp}
-sing-box merge /singbox.json -c /singbox.json -c ${_tmp} --disable-color
+sing-box merge singbox.json -D / -c /singbox.json -c ${_tmp} --disable-color
 rm -f ${_tmp}
 unset _tmp
 
