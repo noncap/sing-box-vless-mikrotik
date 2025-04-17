@@ -1,10 +1,26 @@
 ARG SINGBOX_VERSION=v1.10.1
 
 FROM ghcr.io/sagernet/sing-box:${SINGBOX_VERSION} AS sing-box
-FROM ghcr.io/jqlang/jq:latest AS jq
 
 FROM alpine:latest AS certs
 RUN apk add --no-cache ca-certificates-bundle
+
+# jq #
+FROM alpine:latest AS jq
+RUN apk add --no-cache build-base
+WORKDIR /app
+COPY . /app
+RUN autoreconf -i \
+    && ./configure \
+    --disable-docs \
+    --with-oniguruma=builtin \
+    --enable-static \
+    --enable-all-static \
+    --prefix=/usr/local \
+    && make -j$(nproc) \
+    && make check VERBOSE=yes \
+    && make install-strip
+# --- #
 
 FROM busybox:musl
 LABEL maintainer="Anton Kudriavtsev <anidetrix@proton.me>"
