@@ -26,13 +26,13 @@ DOMAINS="${DOMAINS:-}"
 out="vless-out"
 out_rules="bypass"
 if [ -n "${WHITELIST_MODE}" ]; then
-  _out=${out}
-  out=${out_rules}
-  out_rules=${_out}
-  unset _out
+	_out=${out}
+	out=${out_rules}
+	out_rules=${_out}
+	unset _out
 fi
 
-cat > /singbox.json << EOF
+cat << EOF > /singbox.json
 {
   "log": {
     "level": "${LOG_LEVEL}",
@@ -116,13 +116,6 @@ cat > /singbox.json << EOF
   ],
   "route": {
     "auto_detect_interface": true,
-    "rules": [
-      {
-        "port": [53],
-        "action": "hijack-dns"
-      }
-    ],
-    "rule_set": [],
     "final": "${out}"
   },
   "experimental": {
@@ -133,34 +126,85 @@ cat > /singbox.json << EOF
 }
 EOF
 
+IFS=,
+if [ -n "${RULESETS}" ]; then
+	i=1
+	_rulesets=""
+	for url in ${RULESETS}; do
+		_tmp=$(mktemp)
+		tag="ruleset-${i}"
+		case "${url}" in
+		*.json) format=source ;;
+		*) format=binary ;;
+		esac
+		cat <<- EOF > ${_tmp}
+			{
+			  "route": {
+			    "rule_set": [
+			      {
+			        "tag": "${tag}",
+			        "type": "remote",
+			        "format": "${format}",
+			        "url": "${url}",
+			        "download_detour": "vless-out",
+			        "update_interval": "2h"
+			      }
+			    ]
+			  }
+			}
+		EOF
+		i=$((i + 1))
+		_rulesets="${_rulesets}\"${tag}\","
+		sing-box merge /singbox.json -c /singbox.json -c ${_tmp} --disable-color
+		rm -f ${_tmp}
+		unset _tmp
+	done
+
+	_tmp=$(mktemp)
+	cat <<- EOF > ${_tmp}
+		{
+		  "route": {
+		    "rules": [
+		      {
+		        "rule_set": [${_rulesets%?}],
+		        "action": "route",
+		        "outbound": "${out_rules}"
+		      }
+		    ]
+		  }
+		}
+	EOF
+	sing-box merge /singbox.json -c /singbox.json -c ${_tmp} --disable-color
+	rm -f ${_tmp}
+	unset _rulesets _tmp
+fi
 if [ -n "${DOMAINS}" ]; then
-  OLDIFS=$IFS
-  IFS=,
-  for domain in ${DOMAINS}; do
-    jq -r --arg domain ${domain} --arg out ${out_rules} \
-      '.route.rules += [{"domain_suffix":$domain,"action":"route","outbound":$out}]' /singbox.json > /singbox.json.new
-    mv /singbox.json.new /singbox.json
-  done
-  IFS=$OLDIFS
+	_domains=""
+	for domain in ${DOMAINS}; do _domains="${_domains}\"${domain}\","; done
+	_tmp=$(mktemp)
+	cat <<- EOF > ${_tmp}
+		{
+		  "route": {
+		    "rules": [
+		      {
+		        "domain_suffix": [${_domains%?}],
+		        "action": "route",
+		        "outbound": "${out_rules}"
+		      }
+		    ]
+		  }
+		}
+	EOF
+	sing-box merge /singbox.json -c /singbox.json -c ${_tmp} --disable-color
+	rm -f ${_tmp}
+	unset _domains _tmp
 fi
 
-if [ -n "${RULESETS}" ]; then
-  OLDIFS=$IFS
-  IFS=,
-  i=1
-  for url in ${RULESETS}; do
-    case "${url}" in
-    *.json) format=source ;;
-    *) format=binary ;;
-    esac
-    jq -r --arg tag "ruleset-${i}" --arg format ${format} --arg url ${url} --arg out ${out_rules} \
-      '.route.rule_set += [{"tag":$tag,"type":"remote","format":$format,"url":$url,"download_detour":"vless-out","update_interval":"2h"}]
-     | .route.rules += [{"rule_set":$tag,"action":"route","outbound":$out}]' /singbox.json > /singbox.json.new
-    mv /singbox.json.new /singbox.json
-    i=$((i + 1))
-  done
-  IFS=$OLDIFS
-fi
+_tmp=$(mktemp)
+echo '{"route":{"rules":[{"port":[53],"action":"hijack-dns"}]}}' > ${_tmp}
+sing-box merge /singbox.json -c /singbox.json -c ${_tmp} --disable-color
+rm -f ${_tmp}
+unset _tmp
 
 sing-box check -c /singbox.json --disable-color || exit 1
 exec sing-box run -c /singbox.json --disable-color
