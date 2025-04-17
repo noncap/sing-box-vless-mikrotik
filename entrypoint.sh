@@ -159,7 +159,6 @@ if [ -n "${RULESETS}" ]; then
 		rm -f ${_tmp}
 		unset _tmp
 	done
-
 	_tmp=$(mktemp)
 	cat <<- EOF > ${_tmp}
 		{
