@@ -116,6 +116,7 @@ cat << EOF > /singbox.json
   ],
   "route": {
     "auto_detect_interface": true,
+    "rules": [{ "port": [53], "action": "hijack-dns" }],
     "final": "${out}"
   },
   "experimental": {
@@ -127,6 +128,27 @@ cat << EOF > /singbox.json
 EOF
 
 IFS=,
+if [ -n "${DOMAINS}" ]; then
+	_domains=""
+	for domain in ${DOMAINS}; do _domains="${_domains}\"${domain}\","; done
+	_tmp=$(mktemp)
+	cat <<- EOF > ${_tmp}
+		{
+		  "route": {
+		    "rules": [
+		      {
+		        "domain_suffix": [${_domains%?}],
+		        "action": "route",
+		        "outbound": "${out_rules}"
+		      }
+		    ]
+		  }
+		}
+	EOF
+	sing-box merge singbox.json -D / -c /singbox.json -c ${_tmp} --disable-color 2> /dev/null
+	rm -f ${_tmp}
+	unset _domains _tmp
+fi
 if [ -n "${RULESETS}" ]; then
 	i=1
 	_rulesets=""
@@ -177,33 +199,6 @@ if [ -n "${RULESETS}" ]; then
 	rm -f ${_tmp}
 	unset _rulesets _tmp
 fi
-if [ -n "${DOMAINS}" ]; then
-	_domains=""
-	for domain in ${DOMAINS}; do _domains="${_domains}\"${domain}\","; done
-	_tmp=$(mktemp)
-	cat <<- EOF > ${_tmp}
-		{
-		  "route": {
-		    "rules": [
-		      {
-		        "domain_suffix": [${_domains%?}],
-		        "action": "route",
-		        "outbound": "${out_rules}"
-		      }
-		    ]
-		  }
-		}
-	EOF
-	sing-box merge singbox.json -D / -c /singbox.json -c ${_tmp} --disable-color 2> /dev/null
-	rm -f ${_tmp}
-	unset _domains _tmp
-fi
-
-_tmp=$(mktemp)
-echo '{"route":{"rules":[{"port":[53],"action":"hijack-dns"}]}}' > ${_tmp}
-sing-box merge singbox.json -D / -c /singbox.json -c ${_tmp} --disable-color 2> /dev/null
-rm -f ${_tmp}
-unset _tmp
 
 sing-box check -c /singbox.json --disable-color || exit 1
 exec sing-box run -c /singbox.json --disable-color
