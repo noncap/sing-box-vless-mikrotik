@@ -7,7 +7,7 @@ RUN apk add --no-cache ca-certificates-bundle
 
 # jq #
 FROM alpine:latest AS jq
-RUN apk add --no-cache build-base
+RUN apk add --no-cache build-base autoconf
 WORKDIR /app
 COPY . /app
 RUN autoreconf -i \
