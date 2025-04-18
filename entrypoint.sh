@@ -59,7 +59,6 @@ cat << EOF > /singbox.json
       }
     ],
     "strategy": "prefer_ipv4",
-    "independent_cache": true,
     "reverse_mapping": true
   },
   "inbounds": [
@@ -116,7 +115,15 @@ cat << EOF > /singbox.json
   ],
   "route": {
     "auto_detect_interface": true,
-    "rules": [{ "port": [53], "action": "hijack-dns" }],
+    "rules": [
+      {
+        "action": "sniff"
+      },
+      {
+        "protocol": "dns",
+        "action": "hijack-dns"
+      }
+    ],
     "final": "${out}"
   },
   "experimental": {
@@ -127,17 +134,22 @@ cat << EOF > /singbox.json
 }
 EOF
 
-IFS=,
-if [ -n "${DOMAINS}" ]; then
-	_domains=""
-	for domain in ${DOMAINS}; do _domains="${_domains}\"${domain}\","; done
-	_tmp=$(mktemp)
-	cat <<- EOF > ${_tmp}
+mergeconf() {
+	sing-box merge singbox.json -D / -c /singbox.json -c "$1" --disable-color
+	rm -f "$1"
+}
+
+add_rule() {
+	local IFS=,
+	local entries=""
+	local tmpfile=$(mktemp)
+	for e in $2; do entries="${entries}\"${e}\","; done
+	cat <<- EOF > ${tmpfile}
 		{
 		  "route": {
 		    "rules": [
 		      {
-		        "domain_suffix": [${_domains%?}],
+		        "$1": [${entries%?}],
 		        "action": "route",
 		        "outbound": "${out_rules}"
 		      }
@@ -145,21 +157,23 @@ if [ -n "${DOMAINS}" ]; then
 		  }
 		}
 	EOF
-	sing-box merge singbox.json -D / -c /singbox.json -c ${_tmp} --disable-color 2> /dev/null
-	rm -f ${_tmp}
-	unset _domains _tmp
-fi
-if [ -n "${RULESETS}" ]; then
-	i=1
-	_rulesets=""
-	for url in ${RULESETS}; do
-		_tmp=$(mktemp)
-		tag="ruleset-${i}"
+	mergeconf ${tmpfile}
+}
+
+add_rulesets() {
+	local IFS=,
+	local entries=""
+	local tmpfile=$(mktemp)
+	local i=1
+	for url in $1; do
+		local tag="ruleset-${i}"
+		entries="${entries}${tag},"
+		local format
 		case "${url}" in
 		*.json) format=source ;;
 		*) format=binary ;;
 		esac
-		cat <<- EOF > ${_tmp}
+		cat <<- EOF > ${tmpfile}
 			{
 			  "route": {
 			    "rule_set": [
@@ -175,30 +189,13 @@ if [ -n "${RULESETS}" ]; then
 			  }
 			}
 		EOF
+		mergeconf ${tmpfile}
 		i=$((i + 1))
-		_rulesets="${_rulesets}\"${tag}\","
-		sing-box merge singbox.json -D / -c /singbox.json -c ${_tmp} --disable-color 2> /dev/null
-		rm -f ${_tmp}
-		unset _tmp
 	done
-	_tmp=$(mktemp)
-	cat <<- EOF > ${_tmp}
-		{
-		  "route": {
-		    "rules": [
-		      {
-		        "rule_set": [${_rulesets%?}],
-		        "action": "route",
-		        "outbound": "${out_rules}"
-		      }
-		    ]
-		  }
-		}
-	EOF
-	sing-box merge singbox.json -D / -c /singbox.json -c ${_tmp} --disable-color 2> /dev/null
-	rm -f ${_tmp}
-	unset _rulesets _tmp
-fi
+	add_rule rule_set "${entries%?}"
+}
 
+[ -n "${DOMAINS}" ] && add_rule domain_suffix ${DOMAINS}
+[ -n "${RULESETS}" ] && add_rulesets ${RULESETS}
 sing-box check -c /singbox.json --disable-color || exit 1
 exec sing-box run -c /singbox.json --disable-color
