@@ -5,8 +5,8 @@ git config --local user.email "41898282+github-actions[bot]@users.noreply.github
 TagRemote=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases | jq -r '.[] | select(.prerelease == false) | .tag_name' | head -n1)
 TagDevRemote=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases | jq -r '.[] | select(.prerelease == true) | .tag_name' | head -n1)
 if [ -z "${TagRemote}" ] || [ -z "${TagDevRemote}" ]; then
-  echo "Version check failed!"
-  exit 1
+	echo "Version check failed!"
+	exit 1
 fi
 
 TagLocal=$(cat Tag | head -n1)
@@ -18,15 +18,15 @@ echo "Dev (local): ${TagDevLocal}"
 echo "Dev (remote): ${TagDevRemote}"
 
 if [ "${TagLocal}" != "${TagRemote}" ]; then
-  echo ${TagRemote} > ./Tag
-  git commit -am "Update version to ${TagRemote}"
-  git push -v --progress
-  echo "status=success" >> $GITHUB_OUTPUT
+	echo ${TagRemote} > ./Tag
+	git commit -am "Update version to ${TagRemote}"
+	git push -v --progress
+	echo "status=success" >> $GITHUB_OUTPUT
 fi
 
 if [ "${TagDevLocal}" != "${TagDevRemote}" ]; then
-  echo ${TagDevRemote} > ./TagDev
-  git commit -am "Update dev version to ${TagDevRemote}"
-  git push -v --progress
-  echo "status_dev=success" >> $GITHUB_OUTPUT
+	echo ${TagDevRemote} > ./TagDev
+	git commit -am "Update dev version to ${TagDevRemote}"
+	git push -v --progress
+	echo "status_dev=success" >> $GITHUB_OUTPUT
 fi
