@@ -28,7 +28,7 @@ add name=vless key=FLOW value=xtls-rprx-vision
 add name=vless key=FINGER_PRINT value=chrome
 ```
 
-Rules env variables:
+Optional env variables for rules:
 
 ```rosScript
 /container envs
