@@ -197,5 +197,4 @@ add_rulesets() {
 
 [ -n "${DOMAINS}" ] && add_rule domain_suffix ${DOMAINS}
 [ -n "${RULESETS}" ] && add_rulesets ${RULESETS}
-sing-box check -c /singbox.json --disable-color || exit 1
-exec sing-box run -c /singbox.json --disable-color
+exec runsv /service
