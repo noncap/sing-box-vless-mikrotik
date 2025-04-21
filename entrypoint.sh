@@ -43,14 +43,8 @@ cat << EOF > /singbox.json
       {
         "tag": "dns-proxy",
         "address": "${DNS}",
-        "address_resolver": "dns-direct",
-        "detour": "vless-out"
-      },
-      {
-        "tag": "dns-direct",
-        "address": "${DNS}",
         "address_resolver": "dns-local",
-        "detour": "bypass"
+        "detour": "vless-out"
       },
       {
         "tag": "dns-local",
@@ -135,8 +129,10 @@ cat << EOF > /singbox.json
 EOF
 
 mergeconf() {
-	sing-box merge singbox.json -D / -c /singbox.json -c "$1" --disable-color
-	rm -f "$1"
+	local logfile=$(mktemp)
+	sing-box merge singbox.json -D / -c /singbox.json -c "$1" --disable-color > ${logfile} 2>&1
+	if [ $? -ne 0 ]; then cat ${logfile}; fi
+	rm -f ${logfile} "$1"
 }
 
 add_rule() {
