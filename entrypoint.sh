@@ -138,8 +138,6 @@ mergeconf() {
 	rm -f ${logfile} "$1"
 }
 
-# TODO: BLOCKED var for blocked rulesets (maybe also domains)
-
 add_rule() {
 	local IFS=,
 	local entries=""
