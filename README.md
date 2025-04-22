@@ -1,9 +1,9 @@
-# singbox-vless-mikrotik
+# sing-box-vless-mikrotik
 
 [sing-box](https://sing-box.sagernet.org) container for RouterOS, configured for VLESS with tun interface
 
-- **Docker Hub**: <https://hub.docker.com/r/ani1ak/singbox-vless-mikrotik>
-- **Source**: <https://github.com/Anidetrix/singbox-vless-mikrotik>
+- **Docker Hub**: <https://hub.docker.com/r/ani1ak/sing-box-vless-mikrotik>
+- **Source**: <https://github.com/Anidetrix/sing-box-vless-mikrotik>
 
 Required env variables:
 
