@@ -131,9 +131,14 @@ EOF
 mergeconf() {
 	local logfile=$(mktemp)
 	sing-box merge singbox.json -D / -c /singbox.json -c "$1" --disable-color > ${logfile} 2>&1
-	if [ $? -ne 0 ]; then cat ${logfile}; fi
+	if [ $? -ne 0 ]; then
+		cat ${logfile}
+		exit 1
+	fi
 	rm -f ${logfile} "$1"
 }
+
+# TODO: BLOCKED var for blocked rulesets (maybe also domains)
 
 add_rule() {
 	local IFS=,
@@ -193,4 +198,5 @@ add_rulesets() {
 
 [ -n "${DOMAINS}" ] && add_rule domain_suffix ${DOMAINS}
 [ -n "${RULESETS}" ] && add_rulesets ${RULESETS}
+sing-box check -c /singbox.json --disable-color || exit 1
 exec runsv /service
