@@ -13,9 +13,6 @@ on:
           - dev
           - all
 
-env:
-  DOCKERHUB_REPO: ani1ak/singbox-vless-mikrotik
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -29,12 +26,16 @@ jobs:
           echo "version=$(cat Tag | head -n1)" >> $GITHUB_OUTPUT
           echo "version_dev=$(cat TagDev | head -n1)" >> $GITHUB_OUTPUT
 
+      - name: Set Docker Hub image name
+        id: set-dockerhub
+        run: echo "name=${{ secrets.DOCKERHUB_USERNAME }}/${GITHUB_REPOSITORY#*/}" >> $GITHUB_OUTPUT
+
       - name: Setup Docker meta (release)
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.DOCKERHUB_REPO }}
+            ${{ steps.set-dockerhub.outputs.name }}
             ghcr.io/${{ github.repository }}
           tags: |
             type=semver,pattern={{version}},value=${{ steps.set-version.outputs.version }}
@@ -45,7 +46,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.DOCKERHUB_REPO }}
+            ${{ steps.set-dockerhub.outputs.name }}
             ghcr.io/${{ github.repository }}
           tags: |
             type=semver,pattern={{version}},value=${{ steps.set-version.outputs.version_dev }}
@@ -101,4 +102,4 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: ${{ env.DOCKERHUB_REPO }}
+          repository: ${{ steps.set-dockerhub.outputs.name }}
