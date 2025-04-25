@@ -52,6 +52,12 @@ cat << EOF > /singbox.json
         "detour": "bypass"
       }
     ],
+    "rules": [
+      {
+        "outbound": "any",
+        "server": "dns-local"
+      }
+    ],
     "strategy": "prefer_ipv4",
     "reverse_mapping": true
   },
