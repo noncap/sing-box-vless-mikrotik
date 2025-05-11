@@ -69,7 +69,6 @@ cat << EOF > /singbox.json
       "address": ["198.18.0.1/30"],
       "mtu": 1500,
       "auto_route": true,
-      "auto_redirect": true,
       "strict_route": true,
       "stack": "${TUN_STACK}",
       "route_exclude_address": [
