@@ -6,6 +6,6 @@ FROM alpine:latest
 LABEL maintainer="Anton Kudriavtsev <anidetrix@proton.me>"
 RUN apk add --no-cache ca-certificates-bundle nftables && apk --purge del apk-tools
 COPY --from=sing-box /usr/local/bin/sing-box /bin/sing-box
+COPY --chown=0:0 --chmod=755 openrc.sh /etc/init.d/sing-box
 COPY --chown=0:0 --chmod=755 entrypoint.sh /entrypoint.sh
-COPY --chown=0:0 --chmod=755 service.sh /service/run
 ENTRYPOINT ["/entrypoint.sh"]

@@ -204,4 +204,4 @@ add_rulesets() {
 [ -n "${DOMAINS}" ] && add_rule domain_suffix ${DOMAINS}
 [ -n "${RULESETS}" ] && add_rulesets ${RULESETS}
 sing-box check -c /singbox.json --disable-color || exit 1
-exec runsv /service
+exec rc-service sing-box start
