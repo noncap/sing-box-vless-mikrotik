@@ -3,7 +3,7 @@
 LOG_LEVEL="${LOG_LEVEL:-warn}"
 
 # dns
-DNS="${DNS:-8.8.8.8}"
+DNS="${DNS:-https://8.8.8.8/dns-query}"
 
 # tun
 TUN_STACK="${TUN_STACK:-system}"
@@ -41,15 +41,27 @@ cat << EOF > /singbox.json
   "dns": {
     "servers": [
       {
-        "tag": "dns-proxy",
         "address": "${DNS}",
         "address_resolver": "dns-local",
-        "detour": "vless-out"
+        "detour": "proxy",
+        "strategy": "",
+        "tag": "dns-remote"
       },
       {
-        "tag": "dns-local",
-        "address": "local",
-        "detour": "bypass"
+        "address": "underlying://0.0.0.0",
+        "address_resolver": "dns-local",
+        "detour": "direct",
+        "strategy": "",
+        "tag": "dns-direct"
+      },
+      {
+        "address": "rcode://success",
+        "tag": "dns-block"
+      },
+      {
+        "address": "underlying://0.0.0.0",
+        "detour": "direct",
+        "tag": "dns-local"
       }
     ],
     "rules": [
@@ -58,7 +70,7 @@ cat << EOF > /singbox.json
         "server": "dns-local"
       }
     ],
-    "strategy": "prefer_ipv4",
+    "strategy": "ipv4_only",
     "reverse_mapping": true
   },
   "inbounds": [
